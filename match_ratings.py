@@ -1,6 +1,7 @@
 """
 Match ratings: Adjusted Goal Score and Adjusted Goal Allowed
 """
+# IMPORTANT: 1.37 is for soccer. It should be different for afl!
 
 
 def get_adj_goals_scored(
