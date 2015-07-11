@@ -4,6 +4,27 @@ Match ratings: Adjusted Goal Score and Adjusted Goal Allowed
 # IMPORTANT: 1.37 is for soccer. It should be different for afl!
 
 
+def get_ccc(htcc, vtcc):
+    '''
+    Get the CCC (combined competitiveness coefficient).
+
+    Parameters
+    ----------
+    htcc : float
+        Home team competitiveness coefficient.
+    vtcc : float
+        Visiting team competitiveness coefficient.
+
+    Return
+    --------
+    ccc : float
+        Combined competitiveness coefficient.
+    '''
+    cc_constant = 1.27
+    ccc = htcc * vtcc * cc_constant
+    return ccc
+
+
 def get_adj_goals_scored(
         goals_scored,
         opp_defensive,
