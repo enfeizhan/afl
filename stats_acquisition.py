@@ -34,7 +34,8 @@ def get_team_stats(years=[2001], rds=[1], matchs=[1]):
                     'year': [year],
                     'round': [rd],
                     'home': [hm_team['teamName']],
-                    'away': [aw_team['teamName']],
+                    'hm_score': [
+                        hm_tots['behinds'] + 6 * hm_tots['goals']],
                     'hm_avg_behinds': [hm_avgs['behinds']],
                     'hm_tot_behinds': [hm_tots['behinds']],
                     'hm_avg_bounces': [hm_avgs['bounces']],
@@ -115,6 +116,9 @@ def get_team_stats(years=[2001], rds=[1], matchs=[1]):
                         hm_avgs['uncontestedPossessions']],
                     'hm_tot_uncontestedPossessions': [
                         hm_tots['uncontestedPossessions']],
+                    'away': [aw_team['teamName']],
+                    'aw_score': [
+                        aw_tots['behinds'] + 6 * aw_tots['goals']],
                     'aw_avg_behinds': [aw_avgs['behinds']],
                     'aw_tot_behinds': [aw_tots['behinds']],
                     'aw_avg_bounces': [aw_avgs['bounces']],
