@@ -1,18 +1,20 @@
 import pandas as pd
 import requests
+import sys
+from datetime import datetime
 token_url = 'http://www.afl.com.au/api/cfs/afl/WMCTok'
 stats_url = 'http://www.afl.com.au/stats/'
 stats_api_url_base = 'http://www.afl.com.au/api/cfs/afl/statsCentre/'
-session = requests.Session()
-session.get(stats_url)
-token = session.post(token_url).json()['token']
 
 
-def get_team_stats(years=[2001], rds=[1], matchs=[1]):
+def get_team_stats(years=[2001], rds=[1], matches=[1]):
+    session = requests.Session()
+    session.get(stats_url)
+    token = session.post(token_url).json()['token']
     df = pd.DataFrame()
     for year in years:
         for rd in rds:
-            for match in matchs:
+            for match in matches:
                 stats_api_url = (
                     stats_api_url_base + 'teams?competitionId=CD_S{year:4d}' +
                     '014&roundId=CD_R{year:4d}014{rd:02d}&matchId=CD_M' +
@@ -33,6 +35,7 @@ def get_team_stats(years=[2001], rds=[1], matchs=[1]):
                 row = pd.DataFrame({
                     'year': [year],
                     'round': [rd],
+                    'match': [match],
                     'home': [hm_team['teamName']],
                     'hm_score': [
                         hm_tots['behinds'] + 6 * hm_tots['goals']],
@@ -202,6 +205,102 @@ def get_team_stats(years=[2001], rds=[1], matchs=[1]):
                     })
                 df = df.append(row)
     return df
+
+
+def find_match(stats_df, year, rd, team, home=True):
+    if home:
+        is_the_match = (
+            (stats_df.year == year) &
+            (stats_df.round == rd) &
+            (stats_df.home == team))
+        stats = stats_df.loc[is_the_match]
+        assert stats.shape[0] != 0, 'No match found!'
+        assert stats.shape[0] <= 1, 'Find multiple matches!'
+    else:
+        is_the_match = (
+            (stats_df.year == year) &
+            (stats_df.round == rd) &
+            (stats_df.away == team))
+        stats = stats_df.loc[is_the_match]
+        assert stats.shape[0] != 0, 'No match found!'
+        assert stats.shape[0] <= 1, 'Find multiple matches!'
+    return stats
+
+
+def find_last_match(stats_df, start_year, start_round, team, home=True):
+    original_start_round = start_round
+    for year in range(start_year, 2000, -1):
+        if year != start_year:
+            start_round = stats_df.loc[
+                stats_df.year == year,
+                'round'].max()
+        for rd in range(start_round, 0, -1):
+            try:
+                stats = find_match(
+                    stats_df=stats_df,
+                    year=year,
+                    rd=rd,
+                    team=team,
+                    home=home)
+                return stats
+            except AssertionError:
+                pass
+    else:
+        raise ValueError(
+            'Couldn\'t find the last' +
+            ' {home} '.format(home=('home' if home else 'away')) +
+            'match back from Round' +
+            ' {rd} '.format(rd=original_start_round) +
+            'of Year {year}!'.format(year=start_year))
+
+
+def find_head2head(stats_df, year, rd, hm_team, aw_team):
+    is_the_head2head = (
+        (stats_df.year == year) &
+        (stats_df.round == rd) &
+        (stats_df.home == hm_team) &
+        (stats_df.away == aw_team))
+    stats = stats_df.loc[is_the_head2head]
+    assert stats.shape[0] != 0, 'No head-to-head found!'
+    assert stats.shape[0] <= 1, 'Find multiple head-to-head\'s!'
+    return stats
+
+
+def find_last_head2head(stats_df, start_year, start_round, hm_team, aw_team):
+    original_start_round = start_round
+    for year in range(start_year, 2000, -1):
+        if year != start_year:
+            start_round = stats_df.loc[
+                stats_df.year == year,
+                'round'].max()
+        for rd in range(start_round, 0, -1):
+            try:
+                stats = find_head2head(
+                    stats_df=stats_df,
+                    year=year,
+                    rd=rd,
+                    hm_team=hm_team,
+                    aw_team=aw_team)
+                return stats
+            except AssertionError:
+                pass
+    else:
+        raise ValueError(
+            'Couldn\'t find the last head-to-head between home' +
+            ' {hm_team} '.format(hm_team=hm_team) +
+            'and away' +
+            ' {aw_team} '.format(aw_team=aw_team) +
+            'back from Round' +
+            ' {rd} '.format(rd=original_start_round) +
+            'of Year {year}!'.format(year=start_year))
+
+
+def add_team_stats(stats_file_path, year, rd, match):
+    stats_df = pd.read_csv(stats_file_path)
+    stats = get_team_stats(years=[year], rds=[rd], matches=[match])
+    stats_df = stats_df.append(stats)
+    stats_df = stats_df.sort(['year', 'round', 'match'])
+    stats_df.to_csv(stats_file_path, index=False)
 
 
 if __name__ == '__main__':
