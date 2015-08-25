@@ -1,7 +1,5 @@
 import pandas as pd
 import requests
-import sys
-from datetime import datetime
 token_url = 'http://www.afl.com.au/api/cfs/afl/WMCTok'
 stats_url = 'http://www.afl.com.au/stats/'
 stats_api_url_base = 'http://www.afl.com.au/api/cfs/afl/statsCentre/'
@@ -13,6 +11,7 @@ def get_team_stats(years=[2001], rds=[1], matches=[1]):
     token = session.post(token_url).json()['token']
     df = pd.DataFrame()
     for year in years:
+        print('Reading data in year {year}...'.format(year=year))
         for rd in rds:
             for match in matches:
                 stats_api_url = (
@@ -25,7 +24,10 @@ def get_team_stats(years=[2001], rds=[1], matches=[1]):
                     match=match)
                 data = session.get(
                     stats_api_url,
-                    headers={'X-media-mis-token': token}).json()
+                    headers={'X-media-mis-token': token})
+                if not data.ok:
+                    break
+                data = data.json()
                 hm_team = data['lists'][0]['team']
                 aw_team = data['lists'][1]['team']
                 hm_avgs = data['lists'][0]['stats']['averages']
@@ -303,6 +305,6 @@ def add_team_stats(stats_file_path, year, rd, match):
     stats_df.to_csv(stats_file_path, index=False)
 
 
-if __name__ == '__main__':
-    data = get_team_stats()
-    print(data)
+# if __name__ == '__main__':
+#     data = get_team_stats()
+#     print(data)
