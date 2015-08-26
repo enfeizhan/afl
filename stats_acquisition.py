@@ -305,6 +305,23 @@ def add_team_stats(stats_file_path, year, rd, match):
     stats_df.to_csv(stats_file_path, index=False)
 
 
+def find_last_n_match(stats_df, start_year, start_round, team):
+    pass
+
+
+def get_team_features(stats_df, year, rd, hm_team, aw_team):
+    last_hm_stats = find_last_match(
+        stats_df=stats_df,
+        start_year=year,
+        start_round=rd-1,
+        team=hm_team,
+        home=True)
+    last_aw_stats = find_last_match(
+        stats_df=stats_df,
+        start_year=year,
+        start_round=rd-1,
+        team=aw_team,
+        home=False)
 # if __name__ == '__main__':
 #     data = get_team_stats()
 #     print(data)
