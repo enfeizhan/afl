@@ -305,8 +305,40 @@ def add_team_stats(stats_file_path, year, rd, match):
     stats_df.to_csv(stats_file_path, index=False)
 
 
-def find_last_n_match(stats_df, start_year, start_round, team):
-    pass
+def find_last_n_match(stats_df, n, start_year, start_round, team, home):
+    games_found = pd.Series({})
+    for i in range(n):
+        game_found = find_last_match(
+            stats_df=stats_df,
+            start_year=start_year,
+            start_round=start_round,
+            team=team,
+            home=home)
+        games_found = pd.concat([games_found, game_found])
+        start_round = game_found['round'] - 1
+        start_year = game_found['year']
+        if start_round == 0:
+            start_year -= 1
+    return game_found
+
+
+def last_n_average(stats_df, n, start_year, start_round, team):
+    last_n_home = find_last_n_match(
+        stats_df=stats_df,
+        n=n,
+        start_year=start_year,
+        start_round=start_round,
+        team=team,
+        home=True)
+    last_n_away = find_last_n_match(
+        stats_df=stats_df,
+        n=n,
+        start_year=start_year,
+        start_round=start_round,
+        team=team,
+        home=False)
+    # need to get the average
+    return pd.concat([last_n_home, last_n_away])
 
 
 def get_team_features(stats_df, year, rd, hm_team, aw_team):
@@ -322,6 +354,18 @@ def get_team_features(stats_df, year, rd, hm_team, aw_team):
         start_round=rd-1,
         team=aw_team,
         home=False)
+    hm_last_six_average = last_n_average(
+        stats_df=stats_df,
+        n=6,
+        start_year=year,
+        start_round=rd,
+        team=hm_team)
+    aw_last_six_average = last_n_average(
+        stats_df=stats_df,
+        n=6,
+        start_year=year,
+        start_round=rd,
+        team=aw_team)
 # if __name__ == '__main__':
 #     data = get_team_stats()
 #     print(data)
