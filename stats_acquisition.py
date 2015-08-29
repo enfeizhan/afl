@@ -13,7 +13,9 @@ def get_team_stats(years=[2001], rds=[1], matches=[1]):
     for year in years:
         print('Reading data in year {year}...'.format(year=year))
         for rd in rds:
+            print('Reading data in round {rd}...'.format(rd=rd))
             for match in matches:
+                print('Reading data in match {match}...'.format(match=match))
                 stats_api_url = (
                     stats_api_url_base + 'teams?competitionId=CD_S{year:4d}' +
                     '014&roundId=CD_R{year:4d}014{rd:02d}&matchId=CD_M' +
@@ -305,67 +307,97 @@ def add_team_stats(stats_file_path, year, rd, match):
     stats_df.to_csv(stats_file_path, index=False)
 
 
-def find_last_n_match(stats_df, n, start_year, start_round, team, home):
-    games_found = pd.Series({})
+def find_last_n_matches(stats_df, n, year, start_round, team, home):
+    games_found = pd.DataFrame({})
     for i in range(n):
         game_found = find_last_match(
             stats_df=stats_df,
-            start_year=start_year,
+            start_year=year,
             start_round=start_round,
             team=team,
             home=home)
-        games_found = pd.concat([games_found, game_found])
-        start_round = game_found['round'] - 1
-        start_year = game_found['year']
+        games_found = games_found.append(game_found)
+        start_round = game_found.ix[0, 'round'] - 1
         if start_round == 0:
-            start_year -= 1
-    return game_found
+            break
+    return games_found
 
 
 def last_n_average(stats_df, n, start_year, start_round, team):
-    last_n_home = find_last_n_match(
+    last_n_home = find_last_n_matches(
         stats_df=stats_df,
         n=n,
-        start_year=start_year,
+        year=start_year,
         start_round=start_round,
         team=team,
         home=True)
-    last_n_away = find_last_n_match(
+    last_n_away = find_last_n_matches(
         stats_df=stats_df,
         n=n,
-        start_year=start_year,
+        year=start_year,
         start_round=start_round,
         team=team,
         home=False)
     # need to get the average
+    last_n_home = last_n_home.select_dtypes(include=['number'])
+    last_n_home = last_n_home.mean()
+    last_n_away = last_n_away.select_dtypes(include=['number'])
+    last_n_away = last_n_away.mean()
+    last_n_home.index = 'hm_' + last_n_home.index
+    last_n_away.index = 'aw_' + last_n_away.index
     return pd.concat([last_n_home, last_n_away])
 
 
-def get_team_features(stats_df, year, rd, hm_team, aw_team):
+def get_team_features(stats_df, n, year, rd, hm_team, aw_team):
     last_hm_stats = find_last_match(
         stats_df=stats_df,
         start_year=year,
         start_round=rd-1,
         team=hm_team,
         home=True)
+    last_hm_stats = last_hm_stats.select_dtypes(include=['number'])
+    last_hm_stats = last_hm_stats.iloc[0, :]
     last_aw_stats = find_last_match(
         stats_df=stats_df,
         start_year=year,
         start_round=rd-1,
         team=aw_team,
         home=False)
-    hm_last_six_average = last_n_average(
+    last_aw_stats = last_aw_stats.select_dtypes(include=['number'])
+    last_aw_stats = last_aw_stats.iloc[0, :]
+    hm_last_n_average = last_n_average(
         stats_df=stats_df,
-        n=6,
+        n=n,
         start_year=year,
         start_round=rd,
         team=hm_team)
-    aw_last_six_average = last_n_average(
+    hm_last_n_average.index = 'hm_' + hm_last_n_average.index
+    aw_last_n_average = last_n_average(
         stats_df=stats_df,
-        n=6,
+        n=n,
         start_year=year,
         start_round=rd,
         team=aw_team)
+    aw_last_n_average.index = 'aw_' + aw_last_n_average.index
+    last_head2head = find_last_head2head(
+        stats_df=stats_df,
+        start_year=year,
+        start_round=rd,
+        hm_team=hm_team,
+        aw_team=aw_team)
+    last_head2head = last_head2head.select_dtypes(include=['number'])
+    last_head2head = last_head2head.iloc[0, :]
+    team_features = pd.concat([
+        last_hm_stats,
+        last_aw_stats,
+        hm_last_n_average,
+        aw_last_n_average])
+    print(type(last_hm_stats))
+    print(type(last_aw_stats))
+    print(type(hm_last_n_average))
+    print(type(aw_last_n_average))
+    print(type(last_head2head))
+    return team_features
 # if __name__ == '__main__':
 #     data = get_team_stats()
 #     print(data)
