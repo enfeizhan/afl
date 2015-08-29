@@ -5,7 +5,6 @@ stats_url = 'http://www.afl.com.au/stats/'
 stats_api_url_base = 'http://www.afl.com.au/api/cfs/afl/statsCentre/'
 
 
-
 def get_team_stats(years=[2001], rds=[1], matches=[1]):
     session = requests.Session()
     session.get(stats_url)
