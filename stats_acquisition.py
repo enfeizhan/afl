@@ -392,12 +392,28 @@ def get_team_features(stats_df, n, year, rd, hm_team, aw_team):
         last_aw_stats,
         hm_last_n_average,
         aw_last_n_average])
-    print(type(last_hm_stats))
-    print(type(last_aw_stats))
-    print(type(hm_last_n_average))
-    print(type(aw_last_n_average))
-    print(type(last_head2head))
     return team_features
+
+
+def get_training_data(stats_df):
+    sub_stats_df = stats_df.loc[stats_df.year.isin([2002])]
+    labels = (sub_stats_df.hm_score > sub_stats_df.aw_score).astype(int)
+    features = pd.DataFrame({})
+    for ind_row, row in sub_stats_df.iterrows():
+        print(row['year'], row['round'], row['match'])
+        one_row_features = get_team_features(
+            stats_df=stats_df,
+            n=2,
+            year=row['year'],
+            rd=row['round'],
+            hm_team=row['home'],
+            aw_team=row['away'])
+        features = pd.concat([features, one_row_features.to_frame()], axis=1)
+    features = features.T
+    features.loc[:, 'label'] = labels.values
+    return features
+
+
 # if __name__ == '__main__':
 #     data = get_team_stats()
 #     print(data)
