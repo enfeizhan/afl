@@ -437,7 +437,7 @@ def get_training_data(stats_df):
         one_row_features = get_team_features(
             stats_df=stats_df,
             n=2,
-            year=row['year'],
+            start_year=row['year'],
             rd=row['round'],
             hm_team=row['home'],
             aw_team=row['away'])
