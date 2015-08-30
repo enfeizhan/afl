@@ -297,19 +297,25 @@ def add_team_stats(stats_file_path, year, rd, match):
     stats_df.to_csv(stats_file_path, index=False)
 
 
-def find_last_n_matches(stats_df, n, year, start_round, team, home):
+def find_last_n_matches(stats_df, n, start_year, start_round, team, home):
     games_found = pd.DataFrame({})
     for i in range(n):
-        game_found = find_last_match(
-            stats_df=stats_df,
-            start_year=year,
-            start_round=start_round,
-            team=team,
-            home=home)
+        try:
+            game_found = find_last_match(
+                stats_df=stats_df,
+                start_year=start_year,
+                start_round=start_round,
+                team=team,
+                home=home)
+        except ValueError:
+            break
         games_found = games_found.append(game_found)
+        start_year = game_found.ix[0, 'year']
         start_round = game_found.ix[0, 'round'] - 1
         if start_round == 0:
-            break
+            start_year = start_year - 1
+            start_round = stats_df.loc[
+                stats_df.year == start_year, 'round'].max()
     return games_found
 
 
