@@ -384,16 +384,16 @@ def find_average_change(stats_df, start_year, start_round, team):
 def get_team_features(stats_df, n, start_year, start_round, hm_team, aw_team):
     last_hm_stats = find_last_match(
         stats_df=stats_df,
-        start_year=year,
-        start_round=rd-1,
+        start_year=start_year,
+        start_round=start_round,
         team=hm_team,
         home=True)
     last_hm_stats = last_hm_stats.select_dtypes(include=['number'])
     last_hm_stats = last_hm_stats.iloc[0, :]
     last_aw_stats = find_last_match(
         stats_df=stats_df,
-        start_year=year,
-        start_round=rd-1,
+        start_year=start_year,
+        start_round=start_round,
         team=aw_team,
         home=False)
     last_aw_stats = last_aw_stats.select_dtypes(include=['number'])
@@ -401,21 +401,21 @@ def get_team_features(stats_df, n, start_year, start_round, hm_team, aw_team):
     hm_last_n_average = last_n_average(
         stats_df=stats_df,
         n=n,
-        start_year=year,
-        start_round=rd,
+        start_year=start_year,
+        start_round=start_round,
         team=hm_team)
     hm_last_n_average.index = 'hm_' + hm_last_n_average.index
     aw_last_n_average = last_n_average(
         stats_df=stats_df,
         n=n,
-        start_year=year,
-        start_round=rd,
+        start_year=start_year,
+        start_round=start_round,
         team=aw_team)
     aw_last_n_average.index = 'aw_' + aw_last_n_average.index
     last_head2head = find_last_head2head(
         stats_df=stats_df,
-        start_year=year,
-        start_round=rd,
+        start_year=start_year,
+        start_round=start_round,
         hm_team=hm_team,
         aw_team=aw_team)
     last_head2head = last_head2head.select_dtypes(include=['number'])
