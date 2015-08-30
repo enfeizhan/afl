@@ -344,7 +344,44 @@ def last_n_average(stats_df, n, start_year, start_round, team):
     return pd.concat([last_n_home, last_n_away])
 
 
-def get_team_features(stats_df, n, year, rd, hm_team, aw_team):
+def find_average_change(stats_df, start_year, start_round, team):
+    def remove_header(index):
+        list_from_index = index.tolist()
+        for ind, index_name in enumerate(list_from_index):
+            list_from_index[ind] = index_name[3:]
+        return list_from_index
+    this_round = stats_df.loc[
+        (stats_df.year == start_year) &
+        (stats_df.round == start_round) &
+        (stats_df.away == team)]
+    this_round = this_round.filter(regex='aw_avg_')
+    this_round.columns = remove_header(this_round.columns)
+    if this_round.empty:
+        this_round = stats_df.loc[
+            (stats_df.year == start_year) &
+            (stats_df.round == start_round) &
+            (stats_df.home == team)]
+        this_round = this_round.filter(regex='hm_avg_')
+        this_round.columns = remove_header(this_round.columns)
+    last_round = stats_df.loc[
+        (stats_df.year == start_year) &
+        (stats_df.round == (start_round-1)) &
+        (stats_df.away == team)]
+    last_round = last_round.filter(regex='aw_avg_')
+    last_round.columns = remove_header(last_round.columns)
+    if last_round.empty:
+        last_round = stats_df.loc[
+            (stats_df.year == start_year) &
+            (stats_df.round == (start_round-1)) &
+            (stats_df.home == team)]
+        last_round = last_round.filter(regex='hm_avg_')
+        last_round.columns = remove_header(last_round.columns)
+    print(this_round.iloc[0, 0])
+    print(last_round.iloc[0, 0])
+    return this_round.iloc[0] - last_round.iloc[0]
+
+
+def get_team_features(stats_df, n, start_year, start_round, hm_team, aw_team):
     last_hm_stats = find_last_match(
         stats_df=stats_df,
         start_year=year,
