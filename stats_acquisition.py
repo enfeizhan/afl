@@ -323,14 +323,14 @@ def last_n_average(stats_df, n, start_year, start_round, team):
     last_n_home = find_last_n_matches(
         stats_df=stats_df,
         n=n,
-        year=start_year,
+        start_year=start_year,
         start_round=start_round,
         team=team,
         home=True)
     last_n_away = find_last_n_matches(
         stats_df=stats_df,
         n=n,
-        year=start_year,
+        start_year=start_year,
         start_round=start_round,
         team=team,
         home=False)
