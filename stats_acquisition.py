@@ -13,9 +13,7 @@ def get_team_stats(years=[2001], rds=[1], matches=[1]):
     for year in years:
         print('Reading data in year {year}...'.format(year=year))
         for rd in rds:
-            print('Reading data in round {rd}...'.format(rd=rd))
             for match in matches:
-                print('Reading data in match {match}...'.format(match=match))
                 stats_api_url = (
                     stats_api_url_base + 'teams?competitionId=CD_S{year:4d}' +
                     '014&roundId=CD_R{year:4d}014{rd:02d}&matchId=CD_M' +
@@ -95,30 +93,6 @@ def get_team_stats(years=[2001], rds=[1], matches=[1]):
                     'hm_tot_hitouts': [hm_tots['hitouts']],
                     'hm_avg_inside50s': [hm_avgs['inside50s']],
                     'hm_tot_inside50s': [hm_tots['inside50s']],
-                    'hm_avg_interchangeCap': [
-                        hm_avgs['interchangeCounts']['interchangeCap']],
-                    'hm_tot_interchangeCap': [
-                        hm_tots['interchangeCounts']['interchangeCap']],
-                    'hm_avg_interchangeCountQ1': [
-                        hm_avgs['interchangeCounts']['interchangeCountQ1']],
-                    'hm_tot_interchangeCountQ1': [
-                        hm_tots['interchangeCounts']['interchangeCountQ1']],
-                    'hm_avg_interchangeCountQ2': [
-                        hm_avgs['interchangeCounts']['interchangeCountQ2']],
-                    'hm_tot_interchangeCountQ2': [
-                        hm_tots['interchangeCounts']['interchangeCountQ2']],
-                    'hm_avg_interchangeCountQ3': [
-                        hm_avgs['interchangeCounts']['interchangeCountQ3']],
-                    'hm_tot_interchangeCountQ3': [
-                        hm_tots['interchangeCounts']['interchangeCountQ3']],
-                    'hm_avg_interchangeCountQ4': [
-                        hm_avgs['interchangeCounts']['interchangeCountQ4']],
-                    'hm_tot_interchangeCountQ4': [
-                        hm_tots['interchangeCounts']['interchangeCountQ4']],
-                    'hm_avg_totalInterchangeCount': [
-                        hm_avgs['interchangeCounts']['totalInterchangeCount']],
-                    'hm_tot_totalInterchangeCount': [
-                        hm_tots['interchangeCounts']['totalInterchangeCount']],
                     'hm_avg_kicks': [hm_avgs['kicks']],
                     'hm_tot_kicks': [hm_tots['kicks']],
                     'hm_avg_marks': [hm_avgs['marks']],
@@ -198,30 +172,6 @@ def get_team_stats(years=[2001], rds=[1], matches=[1]):
                     'aw_tot_hitouts': [aw_tots['hitouts']],
                     'aw_avg_inside50s': [aw_avgs['inside50s']],
                     'aw_tot_inside50s': [aw_tots['inside50s']],
-                    'aw_avg_interchangeCap': [
-                        aw_avgs['interchangeCounts']['interchangeCap']],
-                    'aw_tot_interchangeCap': [
-                        aw_tots['interchangeCounts']['interchangeCap']],
-                    'aw_avg_interchangeCountQ1': [
-                        aw_avgs['interchangeCounts']['interchangeCountQ1']],
-                    'aw_tot_interchangeCountQ1': [
-                        aw_tots['interchangeCounts']['interchangeCountQ1']],
-                    'aw_avg_interchangeCountQ2': [
-                        aw_avgs['interchangeCounts']['interchangeCountQ2']],
-                    'aw_tot_interchangeCountQ2': [
-                        aw_tots['interchangeCounts']['interchangeCountQ2']],
-                    'aw_avg_interchangeCountQ3': [
-                        aw_avgs['interchangeCounts']['interchangeCountQ3']],
-                    'aw_tot_interchangeCountQ3': [
-                        aw_tots['interchangeCounts']['interchangeCountQ3']],
-                    'aw_avg_interchangeCountQ4': [
-                        aw_avgs['interchangeCounts']['interchangeCountQ4']],
-                    'aw_tot_interchangeCountQ4': [
-                        aw_tots['interchangeCounts']['interchangeCountQ4']],
-                    'aw_avg_totalInterchangeCount': [
-                        aw_avgs['interchangeCounts']['totalInterchangeCount']],
-                    'aw_tot_totalInterchangeCount': [
-                        aw_tots['interchangeCounts']['totalInterchangeCount']],
                     'aw_avg_kicks': [aw_avgs['kicks']],
                     'aw_tot_kicks': [aw_tots['kicks']],
                     'aw_avg_marks': [aw_avgs['marks']],
